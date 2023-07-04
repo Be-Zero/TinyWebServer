@@ -20,7 +20,8 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <sys/uio.h>
-
+#include <queue>
+#include <vector>
 #include <time.h>
 #include "../log/log.h"
 
@@ -39,13 +40,16 @@ struct client_data
     util_timer *timer;
 };
 
+struct cmp {
+    bool operator()(util_timer *a, util_timer *b) const {
+        return a->expire > b->expire;
+    }
+};
+
 // 连接资源结构体成员需要用到定时器类
 // 计时器
 class util_timer
 {
-public:
-    util_timer() : prev(NULL), next(NULL) {}
-
 public:
     // 超时时间
     time_t expire;
@@ -55,26 +59,17 @@ public:
 
     // 连接资源
     client_data *user_data;
-
-    // 前向定时器
-    util_timer *prev;
-
-    // 后继定时器
-    util_timer *next;
 };
 
 // 升序计时器
-class sort_timer_lst
+class sort_timer_heap
 {
 public:
-    sort_timer_lst();  // 初始化链表
-    ~sort_timer_lst(); // 回收链表空间
+    sort_timer_heap();  // 初始化链表
+    ~sort_timer_heap(); // 回收链表空间
 
     // 添加定时器，内部调用私有成员add_timer
     void add_timer(util_timer *timer);
-
-    // 调整定时器，任务发生变化时，调整定时器在链表中的位置
-    void adjust_timer(util_timer *timer);
 
     // 删除计时器
     void del_timer(util_timer *timer);
@@ -83,12 +78,15 @@ public:
     void tick();
 
 private:
-    // 私有成员，被公有成员add_timer和adjust_time调用
-    // 主要用于调整链表内部结点
-    void add_timer(util_timer *timer, util_timer *lst_head);
-    // 头尾结点
-    util_timer *head;
-    util_timer *tail;
+    // 定义比较器
+    struct cmp {
+        bool operator()(util_timer* a, util_timer* b) const {
+            return a->expire > b->expire;
+        }
+    };
+
+    // 存储计时器的动态数组
+    vector<util_timer*> heap;
 };
 
 // 计时器工具包
@@ -120,7 +118,7 @@ public:
 
 public:
     static int *u_pipefd;
-    sort_timer_lst m_timer_lst;
+    sort_timer_heap m_timer_lst;
     static int u_epollfd;
     int m_TIMESLOT;
 };
