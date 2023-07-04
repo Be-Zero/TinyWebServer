@@ -1,5 +1,5 @@
-#ifndef LST_TIMER
-#define LST_TIMER
+#ifndef HEAP_TIMER
+#define HEAP_TIMER
 
 #include <unistd.h>
 #include <signal.h>
@@ -40,12 +40,6 @@ struct client_data
     util_timer *timer;
 };
 
-struct cmp {
-    bool operator()(util_timer *a, util_timer *b) const {
-        return a->expire > b->expire;
-    }
-};
-
 // 连接资源结构体成员需要用到定时器类
 // 计时器
 class util_timer
@@ -65,11 +59,11 @@ public:
 class sort_timer_heap
 {
 public:
-    sort_timer_heap();  // 初始化链表
-    ~sort_timer_heap(); // 回收链表空间
-
     // 添加定时器，内部调用私有成员add_timer
     void add_timer(util_timer *timer);
+
+    // 调整定时器，任务发生变化时，调整定时器在链表中的位置
+    void adjust_timer(util_timer *timer);
 
     // 删除计时器
     void del_timer(util_timer *timer);
@@ -118,7 +112,7 @@ public:
 
 public:
     static int *u_pipefd;
-    sort_timer_heap m_timer_lst;
+    sort_timer_heap m_timer_heap;
     static int u_epollfd;
     int m_TIMESLOT;
 };

@@ -12,6 +12,12 @@ void sort_timer_heap::add_timer(util_timer *timer)
     make_heap(heap.begin(), heap.end(), cmp());
 }
 
+// 调整定时器，任务发生变化时，调整定时器在链表中的位
+void sort_timer_heap::adjust_timer(util_timer *timer)
+{
+    make_heap(heap.begin(), heap.end(), cmp());
+}
+
 // 删除计时器
 void sort_timer_heap::del_timer(util_timer *timer)
 {
@@ -117,7 +123,7 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
 // 定时处理任务，重新定时以不断触发SIGALRM信号
 void Utils::timer_handler()
 {
-    m_timer_lst.tick();
+    m_timer_heap.tick();
     alarm(m_TIMESLOT);
 }
 

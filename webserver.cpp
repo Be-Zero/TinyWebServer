@@ -206,7 +206,7 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address)
     time_t cur = time(NULL);            // 计时
     timer->expire = cur + 3 * TIMESLOT; // 超时时刻
     users_timer[connfd].timer = timer;  // 存储计时器
-    utils.m_timer_lst.add_timer(timer); // 插入升序链表计时器
+    utils.m_timer_heap.add_timer(timer); // 插入升序链表计时器
 }
 
 // 若有数据传输，则将定时器往后延迟3个单位
@@ -215,7 +215,7 @@ void WebServer::adjust_timer(util_timer *timer)
 {
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
-    utils.m_timer_lst.adjust_timer(timer);
+    utils.m_timer_heap.adjust_timer(timer);
 
     LOG_INFO("%s", "adjust timer once");
 }
@@ -226,7 +226,7 @@ void WebServer::deal_timer(util_timer *timer, int sockfd)
     timer->cb_func(&users_timer[sockfd]);
     if (timer)
     {
-        utils.m_timer_lst.del_timer(timer);
+        utils.m_timer_heap.del_timer(timer);
     }
 
     LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
