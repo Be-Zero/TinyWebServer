@@ -44,6 +44,9 @@ public:
 
     // 并发模型选择
     int actor_model;
+
+    // 计时器模型选择
+    int timer_model;
 };
 
 #endif

@@ -32,13 +32,16 @@ Config::Config()
 
     // 并发模型,默认是proactor
     actor_model = 0;
+
+    // 计时器模型，默认是lst升序链表
+    timer_model = 0;
 }
 
 // 解析参数
 void Config::parse_arg(int argc, char *argv[])
 {
     int opt;
-    const char *str = "p:l:m:o:s:t:c:a:";
+    const char *str = "p:l:m:o:s:t:c:a:j:";
     // 检查是否存在无效选项字符
     while ((opt = getopt(argc, argv, str)) != -1)
     {
@@ -90,6 +93,12 @@ void Config::parse_arg(int argc, char *argv[])
         {
             // 并发模型选择
             actor_model = atoi(optarg);
+            break;
+        }
+        case 'j':
+        {
+            // 计时器模型选择
+            timer_model = atoi(optarg);
             break;
         }
         default:

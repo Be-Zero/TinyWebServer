@@ -126,7 +126,6 @@ void Log::write_log(int level, const char *format, ...)
     // 判断日期或行数是否合规
     if (m_today != my_tm.tm_mday || m_count % m_split_lines == 0) // everyday log
     {
-
         char new_log[256] = {0};
         // 将缓冲区内容写入m_fp
         fflush(m_fp);

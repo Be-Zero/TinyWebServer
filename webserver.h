@@ -27,7 +27,7 @@ public:
     // 初始化
     void init(int port, string user, string passWord, string databaseName,
               int log_write, int opt_linger, int trigmode, int sql_num,
-              int thread_num, int close_log, int actor_model);
+              int thread_num, int close_log, int actor_model, int timer_model);
 
     void thread_pool();
     void sql_pool();
@@ -36,8 +36,10 @@ public:
     void eventListen();
     void eventLoop();
     void timer(int connfd, struct sockaddr_in client_address);
-    void adjust_timer(util_timer *timer);
-    void deal_timer(util_timer *timer, int sockfd);
+    void adjust_timer(util_heap_timer *timer);
+    void adjust_timer(util_lst_timer *timer);
+    void deal_timer(util_heap_timer *timer, int sockfd);
+    void deal_timer(util_lst_timer *timer, int sockfd);
     bool dealclinetdata();
     bool dealwithsignal(bool &timeout, bool &stop_server);
     void dealwithread(int sockfd);
@@ -76,7 +78,8 @@ public:
     int m_CONNTrigmode;   // tcp连接的触发模式
 
     // 定时器相关
+    int m_timer_model;
     client_data *users_timer;
-    Utils utils;
+    Utils utils ;
 };
 #endif
